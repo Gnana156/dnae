@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+   <body>
+   <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.js"></script>
+   <link rel="stylesheet" type="text/css"  href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.css"></link>
+		<script>
+	d3.json("/graph1", function(data) {
+	var values1=[];
+	var values2=[];
+	myObj=jQuery.parseJSON(data).AAPL;
+	key='AAPL';
+	$.each(jQuery.parseJSON(data).AAPL, function(index,value) {
+	
+    values1.push({x: index, y: value});
+});
+$.each(jQuery.parseJSON(data).MSFT, function(index,value) {
+	
+    values2.push({x: index, y: value});
+});
+	data=[{"key":'apple',"values":values1},{"key":'Microsoft',"values":values2}];
+	nv.addGraph(function() {
+    var chart = nv.models.lineWithFocusChart()
+                  .x(function(d) { return d.x })
+                  .y(function(d) { return d.y /100}) //adjusting, 100% is 1.00, not 100 as it is in the data
+                  .color(d3.scale.category10().range())
+                  .useInteractiveGuideline(true)
+                  ;
+
+     chart.xAxis
+        
+        .tickFormat(function(d) {
+            return d3.time.format('%m-%y')(new Date(d))
+          });
+
+    chart.yAxis
+        .tickFormat(d3.format(',.2f'));
+	chart.x2Axis
+        
+        .tickFormat(function(d) {
+            return d3.time.format('%m-%y')(new Date(d))
+          });
+	chart.y2Axis
+    .tickFormat(d3.format(',.2f'));
+
+    d3.select('#chart svg')
+        .datum(data)
+        .call(chart);
+
+    //TODO: Figure out a good way to do this automatically
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+});</script>
+
+      <style>
+
+#chart svg {
+  height: 400px;
+}
+
+</style>
+
+<h1 align="center">Date vs Adj Close</h1>
+<div id="chart">
+  <svg></svg>
+</div>
+      
+   </body>
+</html>
